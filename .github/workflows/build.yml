@@ -26,3 +26,12 @@ jobs:
 
     - name: Run tests
       run: dotnet test PocketLink.sln --configuration Release --no-build --verbosity normal
+
+    - name: Publish Windows x64 executable
+      run: dotnet publish src/PocketLink.App/PocketLink.App.csproj --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true --output artifacts/PocketLink-Monitor-win-x64
+
+    - name: Upload Windows x64 artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: PocketLink-Monitor-win-x64
+        path: artifacts/PocketLink-Monitor-win-x64

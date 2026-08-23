@@ -16,24 +16,37 @@ A read-only monitoring prototype built with mock-first design and safe boundarie
 ## Requirements
 
 - Windows 10/11
-- .NET 8.0 SDK
+- .NET 8.0 SDK (for building from source)
+- **Or download the pre-built executable** (no .NET runtime installation required)
 
 ## Getting Started
 
-### Build
+### Download Pre-built Executable (Recommended)
+
+1. Go to the [Actions tab](https://github.com/henryZhouLikeStudy/pocketlink-monitor/actions/workflows/build.yml) in this repository
+2. Click on the latest successful workflow run
+3. Download the **PocketLink-Monitor-win-x64** artifact
+4. Extract the ZIP file
+5. Run `PocketLink.App.exe` directly—no .NET runtime installation required
+
+The self-contained executable includes all necessary .NET runtime components.
+
+### Build from Source
+
+#### Build
 
 ```powershell
 dotnet restore PocketLink.sln
 dotnet build PocketLink.sln --configuration Release
 ```
 
-### Run
+#### Run
 
 ```powershell
 dotnet run --project src/PocketLink.App/PocketLink.App.csproj
 ```
 
-### Test
+#### Test
 
 ```powershell
 dotnet test PocketLink.sln
