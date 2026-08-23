@@ -29,6 +29,62 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string? _lastError;
 
+    private double _peakDownload;
+    private double _totalDownload;
+    private int _validSampleCount;
+    private DateTime _lastUpdateTime = DateTime.UtcNow;
+
+    public string CurrentDownloadText => LatestThroughput?.Download.Status == SampleStatus.Valid
+        ? $"{LatestThroughput.Download.NormalizedValue:F2}"
+        : "未知";
+
+    public string CurrentUploadText => LatestThroughput?.Upload.Status == SampleStatus.Valid
+        ? $"{LatestThroughput.Upload.NormalizedValue:F2}"
+        : "未知";
+
+    public string PeakDownloadText => _peakDownload > 0
+        ? $"{_peakDownload:F2}"
+        : "未知";
+
+    public string AverageDownloadText => _validSampleCount > 0
+        ? $"{_totalDownload / _validSampleCount:F2}"
+        : "未知";
+
+    public string SampleCountText => ThroughputHistory.Count.ToString();
+
+    public string SignalRsrpText => Signal?.Rsrp.Status == SampleStatus.Valid
+        ? $"{Signal.Rsrp.NormalizedValue:F1} {Signal.Rsrp.Unit}"
+        : "未知";
+
+    public string SignalRsrpSourceText => Signal?.RsrpOrigin switch
+    {
+        SignalFieldOrigin.Z5gRsrp => "5G SA (Z5g_rsrp)",
+        SignalFieldOrigin.NetworkLteRsrp => "LTE (network_lte_rsrp)",
+        _ => "未知",
+    };
+
+    public string SignalSinrText => Signal?.Sinr?.Status == SampleStatus.Valid
+        ? $"{Signal.Sinr.NormalizedValue:F1} {Signal.Sinr.Unit}"
+        : "未知";
+
+    public string NetworkTypeText => Connection is null || Connection.NetworkType == NetworkType.Unknown
+        ? "未知"
+        : Connection.NetworkType.ToString();
+
+    public string PppStatusText => Connection?.PppStatus ?? "未知";
+
+    public string BatteryText => Connection?.BatteryPercent?.Status == SampleStatus.Valid
+        ? $"{Connection.BatteryPercent.NormalizedValue:F0}%"
+        : "未知";
+
+    public string ModelText => Connection?.ModelName ?? "未知";
+
+    public string FirmwareText => Connection?.FirmwareVersion ?? "未知";
+
+    public string LastUpdatedText => _lastUpdateTime.ToString("HH:mm:ss");
+
+    public string UnitText => "单位待验证";
+
     public ObservableCollection<ThroughputSample> ThroughputHistory { get; } = new();
 
     public ObservableCollection<EventEntry> RecentEvents { get; } = new();
@@ -67,6 +123,7 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             Signal = snapshot.Signal;
             LatestThroughput = snapshot.Throughput;
             LastError = null;
+            _lastUpdateTime = DateTime.UtcNow;
 
             ThroughputHistory.Add(snapshot.Throughput);
             while (ThroughputHistory.Count > 120)
@@ -74,9 +131,21 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
                 ThroughputHistory.RemoveAt(0);
             }
 
-            _downloadPoints.Add(snapshot.Throughput.Download.Status == SampleStatus.Valid
+            var downloadValue = snapshot.Throughput.Download.Status == SampleStatus.Valid
                 ? snapshot.Throughput.Download.NormalizedValue
-                : null);
+                : (double?)null;
+
+            if (downloadValue.HasValue)
+            {
+                if (downloadValue.Value > _peakDownload)
+                {
+                    _peakDownload = downloadValue.Value;
+                }
+                _totalDownload += downloadValue.Value;
+                _validSampleCount++;
+            }
+
+            _downloadPoints.Add(downloadValue);
             _uploadPoints.Add(snapshot.Throughput.Upload.Status == SampleStatus.Valid
                 ? snapshot.Throughput.Upload.NormalizedValue
                 : null);
@@ -98,6 +167,21 @@ public sealed partial class DashboardViewModel : ObservableObject, IDisposable
             {
                 RecentEvents.RemoveAt(RecentEvents.Count - 1);
             }
+
+            OnPropertyChanged(nameof(CurrentDownloadText));
+            OnPropertyChanged(nameof(CurrentUploadText));
+            OnPropertyChanged(nameof(PeakDownloadText));
+            OnPropertyChanged(nameof(AverageDownloadText));
+            OnPropertyChanged(nameof(SampleCountText));
+            OnPropertyChanged(nameof(SignalRsrpText));
+            OnPropertyChanged(nameof(SignalRsrpSourceText));
+            OnPropertyChanged(nameof(SignalSinrText));
+            OnPropertyChanged(nameof(NetworkTypeText));
+            OnPropertyChanged(nameof(PppStatusText));
+            OnPropertyChanged(nameof(BatteryText));
+            OnPropertyChanged(nameof(ModelText));
+            OnPropertyChanged(nameof(FirmwareText));
+            OnPropertyChanged(nameof(LastUpdatedText));
         }
         catch (Exception ex)
         {
