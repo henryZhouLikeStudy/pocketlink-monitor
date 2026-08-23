@@ -7,6 +7,42 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Views/Converters.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Dark Navy Data Monitor Theme -->
+            <SolidColorBrush x:Key="BackgroundBrush" Color="#0F172A" />
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#1E293B" />
+            <SolidColorBrush x:Key="SurfaceElevatedBrush" Color="#334155" />
+            <SolidColorBrush x:Key="BorderBrush" Color="#475569" />
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#F8FAFC" />
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#CBD5E1" />
+            <SolidColorBrush x:Key="TextMutedBrush" Color="#94A3B8" />
+            <SolidColorBrush x:Key="AccentCyanBrush" Color="#22D3EE" />
+            <SolidColorBrush x:Key="AccentOrangeBrush" Color="#F97316" />
+            <SolidColorBrush x:Key="SuccessBrush" Color="#4FD1C5" />
+            <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B" />
+            <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444" />
+            <SolidColorBrush x:Key="ChartBackgroundBrush" Color="#0B0E14" />
+
+            <!-- Typography -->
+            <FontFamily x:Key="MonoFont">Consolas, Courier New, monospace</FontFamily>
+
+            <!-- Card Style -->
+            <Style x:Key="DataCard" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+
+            <!-- Stat Card Style -->
+            <Style x:Key="StatCard" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource SurfaceBrush}" />
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Padding" Value="12" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
